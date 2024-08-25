@@ -5,7 +5,6 @@ on:
 
 jobs:
   build:
-
     runs-on: macOS-latest
 
     steps:
@@ -28,13 +27,13 @@ jobs:
     - name: get dependencies
       if: steps.cache.outputs.cache-hit != 'true'
       run: |
-        gem install bundler cocoapods
+        gem install bundler
         bundle install
         bundle exec pod repo update
         bundle exec pod install
 
     - name: actual build
-      run: set -o pipefail && xcodebuild archive -workspace PopcornTime.xcworkspace -scheme PopcornTimeiOS -sdk iphoneos -configuration Debug clean build CODE_SIGN_IDENTITY='' CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO ONLY_ACTIVE_ARCH=NO | tee build.log | xcpretty
+      run: set -o pipefail && xcodebuild archive -project PopcornTime.xcodeproj -scheme PopcornTime -sdk iphoneos -configuration Debug clean build CODE_SIGN_IDENTITY='' CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO ONLY_ACTIVE_ARCH=NO | tee build.log | xcpretty
 
     - name: generate unsigned debug ipa
       run: |
@@ -42,6 +41,7 @@ jobs:
         mkdir Payload
         mv ~/Library/Developer/Xcode/Archives/*/*/Products/Applications/*.app ~/Payload/
         zip -r PopcornTime.ipa Payload
+
     - name: upload ipa
       uses: actions/upload-artifact@v2.2.0
       with:
