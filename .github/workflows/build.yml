@@ -32,10 +32,22 @@ jobs:
     - name: Get dependencies
       if: steps.cache.outputs.cache-hit != 'true'
       run: |
+        # Ensure bundler is installed
         gem install bundler
+
+        # Install dependencies from the Gemfile
         bundle install
+
+        # Ensure the correct version of CocoaPods is installed
+        bundle exec pod _1.8.3_ --version
+
+        # Update the CocoaPods repositories
         bundle exec pod repo update
-        bundle exec pod install
+
+        # Ensure Reachability dependency is fetched correctly
+        # This forces CocoaPods to fetch the specific commit
+        bundle exec pod install --repo-update
+
 
     - name: Build PopcornTime Archive
       run: |
