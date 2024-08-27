@@ -36,12 +36,15 @@ jobs:
 
     - name: Regenerate Gemfile.lock and Podfile.lock
       run: |
-        # Ensure the correct version of CocoaPods is used
-        bundle exec pod --version
-        # Update CocoaPods repositories
-        bundle exec pod repo update
-        # Regenerate lock files
+        # Update the Gemfile to use the correct version of CocoaPods
         bundle update
+        # Remove existing lock files to force regeneration
+        rm Gemfile.lock
+        rm Podfile.lock
+        # Install Bundler dependencies
+        bundle install
+        # Ensure CocoaPods is updated and reinstalled
+        bundle exec pod repo update
         bundle exec pod install --repo-update || { echo "Pod install failed"; exit 1; }
 
     - name: Check Reachability Repository
