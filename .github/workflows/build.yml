@@ -24,30 +24,30 @@ jobs:
         path: |
           Pods
           vendor/bundle
-        key: ${{ runner.os }}-pods-${{ hashFiles('Podfile', 'Podfile.lock') }}-gems-${{ hashFiles('Gemfile', 'Gemfile.lock') }}
+        key: ${{ runner.os }}-pods-${{ hashFiles('Podfile') }}-gems-${{ hashFiles('Gemfile') }}
         restore-keys: |
           ${{ runner.os }}-pods-${{ hashFiles('Podfile') }}-
           ${{ runner.os }}-gems-${{ hashFiles('Gemfile') }}-
 
-    - name: Get dependencies
-      if: steps.cache.outputs.cache-hit != 'true'
+    - name: Ensure Bundler and CocoaPods are Installed
       run: |
-        # Ensure bundler is installed
         gem install bundler
+        gem install cocoapods
 
-        # Install dependencies from the Gemfile
-        bundle install
-
-        # Ensure the correct version of CocoaPods is installed
-        bundle exec pod _1.8.3_ --version
-
-        # Update the CocoaPods repositories
+    - name: Regenerate Gemfile.lock and Podfile.lock
+      run: |
+        # Ensure the correct version of CocoaPods is used
+        bundle exec pod --version
+        # Update CocoaPods repositories
         bundle exec pod repo update
+        # Regenerate lock files
+        bundle update
+        bundle exec pod install --repo-update || { echo "Pod install failed"; exit 1; }
 
-        # Ensure Reachability dependency is fetched correctly
-        # This forces CocoaPods to fetch the specific commit
-        bundle exec pod install --repo-update
-
+    - name: Check Reachability Repository
+      run: |
+        # Verify that Reachability repository is accessible
+        curl -s --head https://github.com/tonymillion/Reachability | head -n 10
 
     - name: Build PopcornTime Archive
       run: |
@@ -60,7 +60,6 @@ jobs:
         -configuration Debug \
         CODE_SIGNING_REQUIRED=NO \
         CODE_SIGNING_ALLOWED=NO
-
 
     - name: Generate unsigned debug IPA
       run: |
