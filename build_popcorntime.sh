@@ -7,6 +7,9 @@ RED='\033[0;31m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
+# Define log file
+LOGFILE="debugging.txt"
+
 # Function to get the current timestamp in HH:MM:SS format
 timestamp() {
     date +"%T"
@@ -14,23 +17,26 @@ timestamp() {
 
 # Function to print success messages in green with "+"
 print_success() {
-    echo -e "${GREEN}[$(timestamp)][+] ${1}${NC}"
+    echo -e "${GREEN}[$(timestamp)][+] ${1}${NC}" | tee -a "$LOGFILE"
 }
 
 # Function to print informational messages in blue with "?"
 print_info() {
-    echo -e "${BLUE}[$(timestamp)][?] ${1}${NC}"
+    echo -e "${BLUE}[$(timestamp)][?] ${1}${NC}" | tee -a "$LOGFILE"
 }
 
 # Function to print warning messages in yellow with "!"
 print_warning() {
-    echo -e "${YELLOW}[$(timestamp)][!] ${1}${NC}"
+    echo -e "${YELLOW}[$(timestamp)][!] ${1}${NC}" | tee -a "$LOGFILE"
 }
 
 # Function to print error messages in red with "x"
 print_error() {
-    echo -e "${RED}[$(timestamp)][x] ${1}${NC}"
+    echo -e "${RED}[$(timestamp)][x] ${1}${NC}" | tee -a "$LOGFILE" >&2
 }
+
+# Initialize log file
+echo "Build Log - $(date)" > "$LOGFILE"
 
 # Step 1: Select the latest Xcode version
 print_info "Selecting the latest Xcode version..."

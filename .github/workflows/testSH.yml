@@ -32,7 +32,15 @@ jobs:
       run: ./build_popcorntime.sh
 
     - name: Upload IPA
+      if: success() || failure()  # Ensure this step runs even if previous steps fail
       uses: actions/upload-artifact@v2.2.0
       with:
         name: 'PopcornTimeTV'
         path: ~/PopcornTimeTV.ipa
+
+    - name: Upload Debug Log
+      if: always()  # Ensure this step runs regardless of the build result
+      uses: actions/upload-artifact@v2.2.0
+      with:
+        name: 'DebuggingLog'
+        path: debugging.txt
