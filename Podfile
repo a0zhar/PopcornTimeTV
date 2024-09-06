@@ -10,20 +10,11 @@ def pods
     pod 'AlamofireImage', '~> 3.5.0'
     pod 'SwiftyTimer', '~> 2.1.0'
     pod 'FloatRatingView', '~> 3.0.1'
-    pod 'ReachabilitySwift', '~> 4.0-beta2'
+    pod 'ReachabilitySwift'
     pod 'MarqueeLabel', '~> 4.0.0'
     pod 'ObjectMapper', '~> 3.5.0'
 end
 
-target 'PopcornTimeiOS' do
-    platform :ios, '9.0'
-    pods
-    pod 'AlamofireNetworkActivityIndicator', '~> 2.4.0'
-    pod 'google-cast-sdk', '~> 4.4'
-    pod 'OBSlider', '~> 1.1.1'
-    pod '1PasswordExtension', '~> 1.8.4'
-    pod 'MobileVLCKit', '~> 3.3.0'
-end
 
 target 'PopcornTimetvOS' do
     platform :tvos, '10.2'
@@ -48,12 +39,6 @@ end
 target 'PopcornKit tvOS' do
     platform :tvos, '10.2'
     kitPods
-end
-
-target 'PopcornKit iOS' do
-    platform :ios, '9.0'
-    kitPods
-    pod 'google-cast-sdk', '~> 4.4'
 end
 
 post_install do |installer|
