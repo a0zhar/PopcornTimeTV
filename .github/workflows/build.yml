@@ -16,6 +16,7 @@ jobs:
       run: |
         sudo xcode-select -s /Applications/$(ls /Applications | grep -E '^Xcode.*\.app$' | sort -rV | head -n 1)
         sudo xcodebuild -license accept
+
     - name: Use cache
       id: cache
       uses: actions/cache@v2
@@ -27,6 +28,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pods-${{ hashFiles('Podfile') }}-
           ${{ runner.os }}-gems-${{ hashFiles('Gemfile') }}-
+
     - name: Get dependencies
       if: steps.cache.outputs.cache-hit != 'true'
       run: |
@@ -34,23 +36,27 @@ jobs:
         bundle install
         pod repo update
         pod install
-    - name: Build PopcornTime Archive
+
+    - name: Build the XCode Project
       run: |
         set -o pipefail && \
         xcodebuild archive \
         -archivePath $RUNNER_TEMP/popcorntime.xcarchive \
         -project PopcornTime.xcodeproj \
         -scheme PopcornTimetvOS \
-        -sdk appletvsdk \
+        -sdk appletvos \
         -configuration Debug \
         CODE_SIGNING_REQUIRED=NO \
-        CODE_SIGNING_ALLOWED=NO
+        CODE_SIGNING_ALLOWED=NO \
+        ONLY_ACTIVE_ARCH=NO | tee build.log | xcpretty
+
     - name: Generate unsigned debug IPA
       run: |
         cd ~
         mkdir Payload
         mv ~/Library/Developer/Xcode/Archives/*/*/Products/Applications/*.app ~/Payload/
         zip -r PopcornTimeTV.ipa Payload
+
     - name: Upload IPA
       uses: actions/upload-artifact@v2.2.0
       with:
