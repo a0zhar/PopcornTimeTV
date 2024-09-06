@@ -48,23 +48,37 @@ jobs:
         TVOS_DEPLOYMENT_TARGET=12.0 \
         | tee build.log | xcpretty
 
-    - name: Generate unsigned debug IPA
+
+    - name: generate unsigned debug ipa
       run: |
         cd ~
         mkdir Payload
         mv ~/Library/Developer/Xcode/Archives/*/*/Products/Applications/*.app ~/Payload/
         zip -r PopcornTime.ipa Payload
 
+    - name: Find and upload build log
+      id: upload-build-log
+      run: |
+        # Search for the build.log file
+        find . -name 'build.log' -print > build_log_path.txt
+        # Check if the file exists and upload it
+        if [ -s build_log_path.txt ]; then
+          build_log_path=$(cat build_log_path.txt)
+          echo "Found build.log at $build_log_path"
+          cp "$build_log_path" build.log
+        else
+          echo "build.log not found."
+        fi
+      continue-on-error: true
+
     - name: Upload build log
-      if: always()  # This ensures the build log is uploaded regardless of previous step results
       uses: actions/upload-artifact@v2
       with:
         name: 'build-log'
         path: build.log
 
-    - name: Upload IPA
-      if: file_exists('~/PopcornTime.ipa')  # Conditional step to check if IPA file exists
-      uses: actions/upload-artifact@v2
+    - name: upload ipa
+      uses: actions/upload-artifact@v2.2.0
       with:
         name: 'PopcornTimeTV'
         path: ~/PopcornTime.ipa
