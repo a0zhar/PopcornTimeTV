@@ -17,39 +17,54 @@ jobs:
         sudo xcode-select -s /Applications/$(ls /Applications | grep -E '^Xcode.*\.app$' | sort -rV | head -n 1)
         sudo xcodebuild -license accept
 
-    - name: use cache
+    - name: Use cache
       id: cache
       uses: actions/cache@v2
       with:
         path: Frameworks
         key: ${{ runner.os }}-${{ hashFiles('Podfile') }}-${{ hashFiles('Gemfile') }}
 
-    - name: get dependencies
+    - name: Get dependencies
       if: steps.cache.outputs.cache-hit != 'true'
       run: |
         gem install bundler
         bundle install
         pod repo update
         pod install
-  
-    - name: Build the XCode Project
+
+    - name: Build the Xcode Project
       run: |
         set -o pipefail && \
         xcodebuild archive \
         -project PopcornTime.xcodeproj \
         -scheme PopcornTimetvOS \
         -sdk appletvos \
-        -configuration Debug clean build CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO APPLICATION_EXTENSION_API_ONLY=YES CODE_SIGN_IDENTITY=''
+        -configuration Debug \
+        -archivePath $RUNNER_TEMP/popcorntime.xcarchive \
+        CODE_SIGNING_REQUIRED=NO \
+        CODE_SIGNING_ALLOWED=NO \
+        APPLICATION_EXTENSION_API_ONLY=YES \
+        CODE_SIGN_IDENTITY='' \
+        TVOS_DEPLOYMENT_TARGET=12.0 \
+        | tee build.log | xcpretty
 
-    - name: generate unsigned debug ipa
+    - name: Generate unsigned debug IPA
       run: |
         cd ~
         mkdir Payload
         mv ~/Library/Developer/Xcode/Archives/*/*/Products/Applications/*.app ~/Payload/
         zip -r PopcornTime.ipa Payload
 
-    - name: upload ipa
-      uses: actions/upload-artifact@v2.2.0
+    - name: Upload build log
+      if: always()  # This ensures the build log is uploaded regardless of previous step results
+      uses: actions/upload-artifact@v2
+      with:
+        name: 'build-log'
+        path: build.log
+
+    - name: Upload IPA
+      if: file_exists('~/PopcornTime.ipa')  # Conditional step to check if IPA file exists
+      uses: actions/upload-artifact@v2
       with:
         name: 'PopcornTimeTV'
         path: ~/PopcornTime.ipa
