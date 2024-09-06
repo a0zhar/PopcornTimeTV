@@ -27,13 +27,19 @@ jobs:
     - name: get dependencies
       if: steps.cache.outputs.cache-hit != 'true'
       run: |
-        gem install bundler cocoapods
+        gem install bundler
         bundle install
-        bundle exec pod repo update
-        bundle exec pod install
-
-    - name: actual build
-      run: set -o pipefail && xcodebuild archive -workspace PopcornTime.xcworkspace -scheme PopcornTimetvOS -sdk appletvos -configuration Debug clean build CODE_SIGN_IDENTITY='' CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO ONLY_ACTIVE_ARCH=NO | tee build.log | xcpretty
+        pod repo update
+        pod install
+  
+    - name: Build the XCode Project
+      run: |
+        set -o pipefail && \
+        xcodebuild archive \
+        -project PopcornTime.xcodeproj \
+        -scheme PopcornTimetvOS \
+        -sdk appletvos \
+        -configuration Debug clean build CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO APPLICATION_EXTENSION_API_ONLY=YES CODE_SIGN_IDENTITY=''
 
     - name: generate unsigned debug ipa
       run: |
