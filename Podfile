@@ -4,58 +4,57 @@ source 'https://github.com/CocoaPods/Specs'
 source 'https://github.com/PopcornTimeTV/Specs'
 
 def pods
-    pod 'PopcornTorrent', '~> 1.4.0' # Latest or best-matching version
-    pod 'XCDYouTubeKit', '~> 3.0.4' # Updated for tvOS 17
-    pod 'Alamofire', '~> 5.7.0' # Updated major version
-    pod 'AlamofireImage', '~> 4.1.0' # Updated major version
-    pod 'SwiftyTimer', '~> 2.2.0' # Latest or best-matching version
-    pod 'FloatRatingView', '~> 4.0.0' # Updated major version
-    pod 'Reachability', :git => 'https://github.com/tonymillion/Reachability' # Ensure latest version
-    pod 'MarqueeLabel', '~> 4.1.0' # Latest or best-matching version
-    pod 'ObjectMapper', '~> 4.2.0' # Updated major version
+    pod 'PopcornTorrent', '~> 1.3.0'
+    pod 'XCDYouTubeKit', '~> 2.8.0'
+    pod 'Alamofire', '~> 4.9.0'
+    pod 'AlamofireImage', '~> 3.5.0'
+    pod 'SwiftyTimer', '~> 2.1.0'
+    pod 'FloatRatingView', '~> 3.0.1'
+    pod 'ReachabilitySwift', '~> 4.0-beta2'
+    pod 'MarqueeLabel', '~> 4.0.0'
+    pod 'ObjectMapper', '~> 3.5.0'
 end
 
 target 'PopcornTimeiOS' do
-    platform :ios, '15.0' # Updated to a more recent iOS version
+    platform :ios, '9.0'
     pods
-    pod 'AlamofireNetworkActivityIndicator', '~> 3.5.0' # Latest or best-matching version
-    pod 'google-cast-sdk', '~> 4.7.0' # Updated for tvOS 17
-    pod 'OBSlider', '~> 2.0.0' # Latest or best-matching version
-    pod '1PasswordExtension', '~> 2.1.0' # Updated major version
-    pod 'MobileVLCKit', '~> 3.5.0' # Latest or best-matching version
+    pod 'AlamofireNetworkActivityIndicator', '~> 2.4.0'
+    pod 'google-cast-sdk', '~> 4.4'
+    pod 'OBSlider', '~> 1.1.1'
+    pod '1PasswordExtension', '~> 1.8.4'
+    pod 'MobileVLCKit', '~> 3.3.0'
 end
 
 target 'PopcornTimetvOS' do
-    platform :tvos, '17.0' # Updated to tvOS 17
+    platform :tvos, '10.2'
     pods
-    pod 'TvOSMoreButton', '~> 1.3.0' # Latest or best-matching version
-    pod 'TVVLCKit', '~> 3.6.0' # Updated for tvOS 17
-    pod 'MBCircularProgressBar', '~> 1.0.0' # Latest or best-matching version
+    pod 'TvOSMoreButton', '~> 1.2.0'
+    pod 'TVVLCKit', '~> 3.3.0'
+    pod 'MBCircularProgressBar', '~> 0.3.5-1'
 end
 
 target 'TopShelf' do
-    platform :tvos, '17.0' # Updated to tvOS 17
-    pod 'ObjectMapper', '~> 4.2.0' # Updated major version
+    platform :tvos, '10.2'
+    pod 'ObjectMapper', '~> 3.5.0'
 end
 
 def kitPods
-    pod 'Alamofire', '~> 5.7.0' # Updated major version
-    pod 'ObjectMapper', '~> 4.2.0' # Updated major version
-    pod 'SwiftyJSON', '~> 5.0.0' # Latest or best-matching version
-    pod 'Locksmith', '~> 4.0.0' # Latest or best-matching version
+    pod 'Alamofire', '~> 4.9.0'
+    pod 'ObjectMapper', '~> 3.5.0'
+    pod 'SwiftyJSON', '~> 5.0.0'
+    pod 'Locksmith', '~> 4.0.0'
 end
 
 target 'PopcornKit tvOS' do
-    platform :tvos, '17.0' # Updated to tvOS 17
+    platform :tvos, '10.2'
     kitPods
 end
 
 target 'PopcornKit iOS' do
-    platform :ios, '15.0' # Updated to a more recent iOS version
+    platform :ios, '9.0'
     kitPods
-    pod 'google-cast-sdk', '~> 4.7.0' # Updated for tvOS 17
+    pod 'google-cast-sdk', '~> 4.4'
 end
-
 
 post_install do |installer|
     installer.pods_project.targets.each do |target|
