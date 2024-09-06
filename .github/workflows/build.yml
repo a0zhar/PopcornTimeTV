@@ -17,48 +17,33 @@ jobs:
         sudo xcode-select -s /Applications/$(ls /Applications | grep -E '^Xcode.*\.app$' | sort -rV | head -n 1)
         sudo xcodebuild -license accept
 
-    - name: Use cache
+    - name: use cache
       id: cache
       uses: actions/cache@v2
       with:
-        path: |
-          Pods
-          vendor/bundle
-        key: ${{ runner.os }}-pods-${{ hashFiles('Podfile', 'Podfile.lock') }}-gems-${{ hashFiles('Gemfile', 'Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-pods-${{ hashFiles('Podfile') }}-
-          ${{ runner.os }}-gems-${{ hashFiles('Gemfile') }}-
+        path: Frameworks
+        key: ${{ runner.os }}-${{ hashFiles('Podfile') }}-${{ hashFiles('Gemfile') }}
 
-    - name: Get dependencies
+    - name: get dependencies
       if: steps.cache.outputs.cache-hit != 'true'
       run: |
-        gem install bundler
+        gem install bundler cocoapods
         bundle install
-        pod repo update
-        pod install
+        bundle exec pod repo update
+        bundle exec pod install
 
-    - name: Build the XCode Project
-      run: |
-        set -o pipefail && \
-        xcodebuild archive \
-        -archivePath $RUNNER_TEMP/popcorntime.xcarchive \
-        -project PopcornTime.xcodeproj \
-        -scheme PopcornTimetvOS \
-        -sdk appletvos \
-        -configuration Debug \
-        CODE_SIGNING_REQUIRED=NO \
-        CODE_SIGNING_ALLOWED=NO \
-        ONLY_ACTIVE_ARCH=NO | tee build.log | xcpretty
+    - name: actual build
+      run: set -o pipefail && xcodebuild archive -workspace PopcornTime.xcworkspace -scheme PopcornTimetvOS -sdk appletvos -configuration Debug clean build CODE_SIGN_IDENTITY='' CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO ONLY_ACTIVE_ARCH=NO | tee build.log | xcpretty
 
-    - name: Generate unsigned debug IPA
+    - name: generate unsigned debug ipa
       run: |
         cd ~
         mkdir Payload
         mv ~/Library/Developer/Xcode/Archives/*/*/Products/Applications/*.app ~/Payload/
-        zip -r PopcornTimeTV.ipa Payload
+        zip -r PopcornTime.ipa Payload
 
-    - name: Upload IPA
+    - name: upload ipa
       uses: actions/upload-artifact@v2.2.0
       with:
         name: 'PopcornTimeTV'
-        path: ~/PopcornTimeTV.ipa
+        path: ~/PopcornTime.ipa
