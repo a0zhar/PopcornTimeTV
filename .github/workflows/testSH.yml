@@ -1,0 +1,38 @@
+name: Build PopcornTimeTV
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macOS-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Set up script permissions
+      run: chmod +x ./build_popcorntime.sh
+
+    - name: Use cache
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          Pods
+          vendor/bundle
+        key: ${{ runner.os }}-pods-${{ hashFiles('Podfile', 'Podfile.lock') }}-gems-${{ hashFiles('Gemfile', 'Gemfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-pods-${{ hashFiles('Podfile') }}-
+          ${{ runner.os }}-gems-${{ hashFiles('Gemfile') }}-
+
+    - name: Run Build Script
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: ./build_popcorntime.sh
+
+    - name: Upload IPA
+      uses: actions/upload-artifact@v2.2.0
+      with:
+        name: 'PopcornTimeTV'
+        path: ~/PopcornTimeTV.ipa
