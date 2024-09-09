@@ -34,19 +34,7 @@ jobs:
 
     - name: Build the Xcode Project
       run: |
-        set -o pipefail && \
-        xcodebuild archive \
-        -project PopcornTime.xcodeproj \
-        -scheme PopcornTimetvOS \
-        -sdk appletvos \
-        -configuration Debug \
-        -archivePath $RUNNER_TEMP/popcorntime.xcarchive \
-        CODE_SIGNING_REQUIRED=NO \
-        CODE_SIGNING_ALLOWED=NO \
-        APPLICATION_EXTENSION_API_ONLY=YES \
-        CODE_SIGN_IDENTITY='' \
-        TVOS_DEPLOYMENT_TARGET=12.0 \
-        | tee build.log | xcpretty
+        set -o pipefail && xcodebuild archive -workspace PopcornTime.xcworkspace -scheme PopcornTimetvOS -sdk appletvos -configuration Debug clean build CODE_SIGN_IDENTITY='' CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO ONLY_ACTIVE_ARCH=NO | tee build.log | xcpretty
 
 
     - name: generate unsigned debug ipa
